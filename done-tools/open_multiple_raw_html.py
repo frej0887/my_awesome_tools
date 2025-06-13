@@ -13,7 +13,7 @@ description = f"""
 Tool for opening multiple scrapes.
 Can be used for production ranks, local ranks or pages in playwright.
 
-Opening types possibilities:
+Opening type possibilities:
 {PRODUCTION_TYPES[0].title()}: {", ".join(PRODUCTION_TYPES)}
 {LOCAL_TYPES[0].title()}: {", ".join(LOCAL_TYPES)}
 {PLAYWRIGHT_TYPES[0].title()}: {", ".join(PLAYWRIGHT_TYPES)}
