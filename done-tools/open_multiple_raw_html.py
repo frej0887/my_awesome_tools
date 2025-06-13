@@ -12,7 +12,6 @@ url_playwright = lambda keyword, device: f"http://localhost:1337/google/scrape?k
 description = f"""
 Tool for opening multiple scrapes.
 Can be used for production ranks, local ranks or pages in playwright.
-Put the rank ids in input.txt, one per line (just copy directly from DataGrip).
 
 Opening types possibilities:
 {PRODUCTION_TYPES[0].title()}: {", ".join(PRODUCTION_TYPES)}
@@ -30,66 +29,74 @@ Both: 0 (doubles the amount of opens)
 
 break_text = """------------------------------------------------\n\n\n\n"""
 
-opening_types = {x: url_prod for x in PRODUCTION_TYPES} | {x: url_local for x in LOCAL_TYPES} | {x: url_playwright for x in PLAYWRIGHT_TYPES}
+url_template_dict = {x: url_prod for x in PRODUCTION_TYPES} | {x: url_local for x in LOCAL_TYPES} | {x: url_playwright for x in PLAYWRIGHT_TYPES}
 
 
-while True:
+if __name__ == "__main__":
+    device = '0'
+    amount_used = 0
     print(description)
     open_type = input("Opening type: ").strip()
-    if not open_type or not open_type in opening_types.keys():
+
+    if not open_type or not open_type in url_template_dict.keys():
         print("Invalid opening type, try again")
         print(break_text)
-        continue
-
-    open_amount = input("Amount of scrapes to open: ").strip()
-    try:
-        open_amount = int(open_amount)
-        assert open_amount > 0
-    except ValueError:
-        print("Invalid amount, try again")
-        print(break_text)
-        continue
-    if open_amount > 100:
-        print(f"You are opening {open_amount} scrapes, are you sure? (y/n)")
-        confirm = input().strip()
-        if confirm.lower() == 'y':
-            pass
-        elif confirm.lower() == 'n':
-            print("Try again")
-            print(break_text)
-            continue
-        else:
-            print("Invalid input, try again")
-            print(break_text)
-            continue
+        exit(1)
 
     if open_type in PLAYWRIGHT_TYPES:
         print(PLAYWRIGHT_TEXT)
-        device = input("Device: ").strip()
-        if not device:
-            print("Invalid device, try again")
+        while True:
+            device = input("Device: ").strip()
+            if not device:
+                print("Invalid device, try again")
+                print(break_text)
+                break
+
+    print("Input the ids you want to open")
+    keywords = []
+    while True:
+        inp = input()
+        if inp == "":
+            print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
+            break
+        keywords.append(inp.strip())
+
+    shuffle(keywords)
+    while True:
+
+        amount_asked_to_open = input("Amount of scrapes to open: ").strip()
+        try:
+            amount_asked_to_open = int(amount_asked_to_open)
+            assert amount_asked_to_open > 0
+        except ValueError:
+            print("Invalid amount, try again")
             print(break_text)
             continue
-        with open("input.txt", "r") as f:
-            lines = [l.strip() for l in f.readlines() if l.strip()]
-            if len(lines) < open_amount:
-                print(f"There are not that many ids to open. All the {len(lines)} given ids will be opened")
-            shuffle(lines)
-            for rank_id in lines[:open_amount]:
-                if open_type in PLAYWRIGHT_TYPES:
-                    if device == '0':
-                        webbrowser.open_new_tab(opening_types[open_type](rank_id, 1))
-                        webbrowser.open_new_tab(opening_types[open_type](rank_id, 2))
-                    else:
-                        webbrowser.open_new_tab(opening_types[open_type](rank_id, device))
-        print(break_text)
-        continue
+        if amount_asked_to_open > 100:
+            print(f"You are opening {amount_asked_to_open} scrapes, are you sure? (y/n)")
+            confirm = input().strip()
+            if confirm.lower() == 'y':
+                pass
+            elif confirm.lower() == 'n':
+                print("Try again")
+                print(break_text)
+                continue
+            else:
+                print("Invalid input, try again")
+                print(break_text)
+                continue
 
-    with open("input.txt", "r") as f:
-        lines = [l.strip() for l in f.readlines() if l.strip()]
-        if len(lines) < open_amount:
-            print(f"There are not that many ids to open. All the {len(lines)} given ids will be opened")
-        shuffle(lines)
-        for rank_id in lines[:open_amount]:
-            webbrowser.open_new_tab(opening_types[open_type](rank_id))
-    print(break_text)
+        if len(keywords) < amount_used + amount_asked_to_open:
+            print(f"There are not that many ids to open. The last unused will be opened")
+
+        print("Opening the ids...\n")
+        for rank_id in keywords[amount_used:min(len(keywords), amount_used + amount_asked_to_open)]:
+            if open_type in PLAYWRIGHT_TYPES:
+                if device == '0':
+                    webbrowser.open_new_tab(url_template_dict[open_type](rank_id, 1))
+                    webbrowser.open_new_tab(url_template_dict[open_type](rank_id, 2))
+                else:
+                    webbrowser.open_new_tab(url_template_dict[open_type](rank_id, device))
+            else:
+                webbrowser.open_new_tab(url_template_dict[open_type](rank_id))
+        amount_used += amount_asked_to_open
