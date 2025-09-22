@@ -7,7 +7,7 @@ PLAYWRIGHT_TYPES = ["playwright", "1337", "leet", "3"]
 
 url_prod = lambda keyword_id: f"https://app.accuranker.com/keywords/ranks/{keyword_id}/raw_html/"
 url_local = lambda keyword_id: f"http://localhost.dk:8000/keywords/ranks/{keyword_id}/raw_html/"
-url_playwright = lambda keyword, device: f"http://localhost:1337/google/scrape_ai_overview?prompt={keyword}&device={device}"
+url_playwright = lambda keyword, dev: f"http://localhost:1337/google/scrape_serp?keyword={keyword}&device={dev}"
 
 description = f"""
 Tool for opening multiple scrapes.
@@ -53,7 +53,7 @@ if __name__ == "__main__":
                 print("Invalid device, try again")
                 print(break_text)
 
-    print("Input the ids you want to open")
+    print("Input the ids you want to sample from")
     keywords = []
     while True:
         inp = input()
